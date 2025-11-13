@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ApexPlanet — Professional To-Do Suite</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">🌐 ApexPlanet</div>
+    <nav class="nav">
+      <a href="index.html" class="active">Home</a>
+      <a href="todo.html">To-Do</a>
+      <a href="products.html">Products</a>
+      <a href="notes.html">Notes</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div style="margin-top:18px;" class="small">Theme: <button id="themeToggle" class="btn">Dark</button></div>
+  </aside>
+
+  <div>
+    <header class="header">
+      <div class="row">
+        <div class="kicker small">Pro Pack</div>
+        <div class="h1">ApexPlanet — Tasks & Productivity</div>
+      </div>
+      <div class="controls">
+        <a class="btn" href="todo.html">Open To-Do</a>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="hero card">
+        <div class="hero-left">
+          <div class="kicker">Organize • Focus • Deliver</div>
+          <h2 class="h1">Beautiful UI, delightful interactions, built for speed.</h2>
+          <p class="lead">This multi-page demo includes a professional To-Do app with animations, products demo, notes, and a contact page. Try the theme toggle on the left.</p>
+          <div style="margin-top:12px;">
+            <a class="btn" href="todo.html">Try To-Do →</a>
+            <a class="btn" href="products.html" style="background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,0.04);">Products</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Why this UI?</h3>
+        <p class="small">Readable text, clear contrast, spacious layout, subtle motion with GSAP, and mobile-friendly controls — everything tuned for a pleasant user experience.</p>
+      </section>
+
+      <div class="footer card">
+        © ApexPlanet — Demo UI Pack
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+// theme toggle with persistence
+const themeToggle = document.getElementById('themeToggle');
+const root = document.documentElement;
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  themeToggle.textContent = t === 'dark' ? 'Light' : 'Dark';
+  localStorage.setItem('apex_theme', t);
+}
+themeToggle.addEventListener('click', ()=>{
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  applyTheme(cur === 'light' ? 'dark' : 'light');
+});
+// init
+const saved = localStorage.getItem('apex_theme') || 'light';
+applyTheme(saved);
+</script>
+</body>
+</html>

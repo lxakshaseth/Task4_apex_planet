@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Notes — ApexPlanet</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">🌐 ApexPlanet</div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="todo.html">To-Do</a>
+      <a href="products.html">Products</a>
+      <a href="notes.html" class="active">Notes</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div style="margin-top:18px;" class="small">Theme: <button id="themeToggleN" class="btn">Dark</button></div>
+  </aside>
+
+  <div>
+    <header class="header">
+      <div class="row"><div class="kicker small">Notes</div><div class="h1">Quick Notes</div></div>
+      <div class="controls"><a class="btn" href="index.html">Back</a></div>
+    </header>
+
+    <main class="main">
+      <section class="card">
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <input id="noteTitle" placeholder="Title" />
+          <button id="addNote" class="btn">Add</button>
+        </div>
+        <div id="notesList" class="tasks"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+const LS_NOTES = 'apex_notes_v2';
+let notes = JSON.parse(localStorage.getItem(LS_NOTES) || '[]');
+
+const noteTitle = document.getElementById('noteTitle');
+const addNote = document.getElementById('addNote');
+const notesList = document.getElementById('notesList');
+
+function renderNotes(){
+  notesList.innerHTML = notes.map(n=>`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;"><div><strong>${n.title}</strong><div class="small">${new Date(n.createdAt).toLocaleString()}</div></div><div><button class="btn" data-id="${n.id}" onclick="deleteNote(event)">Delete</button></div></div></div>`).join('');
+}
+function addNewNote(){
+  const t = noteTitle.value.trim(); if(!t) return;
+  notes.unshift({ id: Date.now().toString(36), title: t, createdAt: Date.now()});
+  localStorage.setItem(LS_NOTES, JSON.stringify(notes));
+  noteTitle.value=''; renderNotes();
+}
+function deleteNote(e){
+  const id = e.currentTarget.dataset.id; notes = notes.filter(n=>n.id!==id); localStorage.setItem(LS_NOTES, JSON.stringify(notes)); renderNotes();
+}
+addNote.addEventListener('click', addNewNote);
+renderNotes();
+</script>
+</body>
+</html>

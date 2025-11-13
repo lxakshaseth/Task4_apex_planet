@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Products — ApexPlanet</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">🌐 ApexPlanet</div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="todo.html">To-Do</a>
+      <a href="products.html" class="active">Products</a>
+      <a href="notes.html">Notes</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div style="margin-top:18px;" class="small">Theme: <button id="themeToggleP" class="btn">Dark</button></div>
+  </aside>
+
+  <div>
+    <header class="header">
+      <div class="row"><div class="kicker small">Products</div><div class="h1">Product Listing</div></div>
+      <div class="controls"><a class="btn" href="index.html">Back</a></div>
+    </header>
+
+    <main class="main">
+      <section class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <div style="display:flex;gap:10px;align-items:center;">
+            <input id="search" placeholder="Search products..." style="width:320px;" />
+            <select id="category"><option value="all">All</option><option value="electronics">Electronics</option><option value="books">Books</option></select>
+          </div>
+          <div class="small">Demo data • client-side filters</div>
+        </div>
+
+        <div id="products" style="margin-top:12px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px;"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+const sample = [
+  {id:1,title:'Wireless Headphones',price:59.99,cat:'electronics',rating:4.4},
+  {id:2,title:'Smartphone Stand',price:12.5,cat:'electronics',rating:4.1},
+  {id:3,title:'Coffee Maker',price:79.0,cat:'home',rating:4.6},
+  {id:4,title:'JavaScript Book',price:29.99,cat:'books',rating:4.8},
+  {id:5,title:'Desk Lamp',price:24.0,cat:'home',rating:4.2}
+];
+const container = document.getElementById('products');
+const search = document.getElementById('search');
+const category = document.getElementById('category');
+
+function render(){
+  const q = (search.value||'').toLowerCase();
+  const cat = category.value;
+  const out = sample.filter(p=>{
+    if(cat!=='all' && p.cat!==cat) return false;
+    if(q && !p.title.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  container.innerHTML = out.map(p=>`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;"><div><strong>${p.title}</strong><div class="small">${p.cat} • ★ ${p.rating}</div></div><div style="text-align:right"><div style="font-weight:800">$${p.price.toFixed(2)}</div><div style="margin-top:8px"><a class="btn" href="#">View</a></div></div></div></div>`).join('');
+}
+search.addEventListener('input', render);
+category.addEventListener('change', render);
+render();
+</script>
+</body>
+</html>

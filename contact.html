@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contact — ApexPlanet</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">🌐 ApexPlanet</div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="todo.html">To-Do</a>
+      <a href="products.html">Products</a>
+      <a href="notes.html">Notes</a>
+      <a href="contact.html" class="active">Contact</a>
+    </nav>
+    <div style="margin-top:18px;" class="small">Theme: <button id="themeToggleC" class="btn">Dark</button></div>
+  </aside>
+
+  <div>
+    <header class="header">
+      <div class="row"><div class="kicker small">Contact</div><div class="h1">Get in touch</div></div>
+      <div class="controls"><a class="btn" href="index.html">Back</a></div>
+    </header>
+
+    <main class="main">
+      <section class="card">
+        <p class="small">This is a demo contact form (no backend).</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <input id="name" placeholder="Your name" />
+          <input id="email" placeholder="Email" />
+          <textarea id="message" rows="5" placeholder="Message"></textarea>
+          <div style="display:flex;gap:8px;"><button id="send" class="btn">Send</button><button id="clear" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--text)">Clear</button></div>
+          <div id="sent" class="small" style="display:none;color:var(--accent)">Message simulated as sent.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+document.getElementById('send').addEventListener('click', ()=>{
+  document.getElementById('sent').style.display='block';
+});
+document.getElementById('clear').addEventListener('click', ()=>{
+  document.getElementById('name').value=''; document.getElementById('email').value=''; document.getElementById('message').value=''; document.getElementById('sent').style.display='none';
+});
+</script>
+</body>
+</html>

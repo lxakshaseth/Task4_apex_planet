@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>To-Do — ApexPlanet</title>
+<link rel="stylesheet" href="styles.css">
+<!-- GSAP CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">🌐 ApexPlanet</div>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="todo.html" class="active">To-Do</a>
+      <a href="products.html">Products</a>
+      <a href="notes.html">Notes</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <div style="margin-top:18px;" class="small">Theme: <button id="themeToggleS" class="btn">Dark</button></div>
+  </aside>
+
+  <div>
+    <header class="header">
+      <div class="row">
+        <div class="kicker small">Tasks</div>
+        <div class="h1">To-Do — Focus Mode</div>
+      </div>
+      <div class="controls">
+        <button id="addSample" class="btn">+ Sample Task</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="card">
+        <div class="todo-controls">
+          <div class="input" style="flex:1">
+            <input id="taskText" placeholder="What do you want to do?" />
+            <select id="taskPriority" style="width:140px">
+              <option value="Low">Low</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="High">High</option>
+            </select>
+            <button id="addBtn" class="btn">Add</button>
+          </div>
+        </div>
+
+        <div class="row" style="margin-bottom:8px;">
+          <div class="small">Filter:</div>
+          <div class="row" id="filters">
+            <button class="btn" data-filter="all">All</button>
+            <button class="btn" data-filter="active">Active</button>
+            <button class="btn" data-filter="completed">Completed</button>
+          </div>
+          <div class="right small">Saved locally • animations powered by GSAP</div>
+        </div>
+
+        <div id="tasksContainer" class="tasks"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script>
+// theme sync
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('apex_theme', t);
+}
+document.querySelectorAll('#themeToggleS').forEach(el=>{
+  el?.addEventListener('click', ()=>{
+    const cur = document.documentElement.getAttribute('data-theme')||'light';
+    applyTheme(cur==='light'?'dark':'light');
+  });
+});
+const savedTheme = localStorage.getItem('apex_theme')||'light';
+applyTheme(savedTheme);
+document.getElementById('themeToggleS').textContent = savedTheme==='light' ? 'Dark' : 'Light';
+
+// App logic with localStorage
+const LS = 'apex_tasks_v2';
+let tasks = JSON.parse(localStorage.getItem(LS) || '[]');
+let filter = 'all';
+
+const taskText = document.getElementById('taskText');
+const taskPriority = document.getElementById('taskPriority');
+const addBtn = document.getElementById('addBtn');
+const tasksContainer = document.getElementById('tasksContainer');
+const addSample = document.getElementById('addSample');
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function save(){ localStorage.setItem(LS, JSON.stringify(tasks)); }
+
+function render(){
+  tasksContainer.innerHTML = '';
+  const out = tasks.filter(t=>{
+    if(filter==='active') return !t.completed;
+    if(filter==='completed') return t.completed;
+    return true;
+  });
+  out.forEach((t,idx)=>{
+    const el = document.createElement('div');
+    el.className='task card';
+    el.dataset.id = t.id;
+    el.innerHTML = `
+      <div class="left">
+        <div class="checkbox" data-id="${t.id}">${t.completed? '✓':''}</div>
+        <div>
+          <div class="title">${escapeHtml(t.text)}</div>
+          <div class="meta">${t.createdAt? new Date(t.createdAt).toLocaleString(): ''}</div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="badge ${t.priority.toLowerCase()}">${t.priority}</div>
+        <div style="width:8px"></div>
+        <button class="btn edit" data-action="edit">Edit</button>
+        <button class="btn delete" data-action="delete">Delete</button>
+      </div>
+    `;
+    tasksContainer.appendChild(el);
+
+    // animate in
+    gsap.from(el, {opacity:0, y:10, duration:0.45, ease:"power2.out", delay: idx*0.03});
+  });
+
+  // attach handlers
+  document.querySelectorAll('.checkbox').forEach(cb=>{
+    cb.onclick = ()=>{
+      const id = cb.dataset.id;
+      toggleComplete(id);
+    };
+  });
+  document.querySelectorAll('.btn.delete').forEach(b=>{
+    b.onclick = (e)=>{
+      const id = e.currentTarget.closest('.task').dataset.id;
+      tasks = tasks.filter(x=>x.id!==id);
+      save(); render();
+    };
+  });
+  document.querySelectorAll('.btn.edit').forEach(b=>{
+    b.onclick = (e)=>{
+      const id = e.currentTarget.closest('.task').dataset.id;
+      const t = tasks.find(x=>x.id===id);
+      const newText = prompt('Edit task', t.text);
+      if(newText!==null){ t.text = newText; save(); render(); }
+    };
+  });
+}
+
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function addTask(text, priority){
+  if(!text || !text.trim()) return;
+  const t = { id: uid(), text: text.trim(), priority: priority||'Medium', completed:false, createdAt: Date.now() };
+  tasks.unshift(t);
+  save();
+  render();
+  // pulse animation for new item
+  const first = document.querySelector('.task');
+  if(first) gsap.fromTo(first, {scale:0.98}, {scale:1, duration:0.35, ease:'elastic.out(1,0.5)'});
+}
+
+addBtn.addEventListener('click', ()=>{ addTask(taskText.value, taskPriority.value); taskText.value=''; });
+addSample.addEventListener('click', ()=> addTask('Sample task created', 'Medium'));
+
+// filter buttons
+document.querySelectorAll('#filters .btn').forEach(b=>{
+  b.addEventListener('click', (e)=>{
+    document.querySelectorAll('#filters .btn').forEach(x=>x.classList.remove('active'));
+    e.currentTarget.classList.add('active');
+    filter = e.currentTarget.dataset.filter;
+    render();
+  });
+});
+
+// click checkbox handler (toggle)
+function toggleComplete(id){
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+  t.completed = !t.completed;
+  save(); render();
+}
+
+// initial render
+render();
+</script>
+</body>
+</html>
